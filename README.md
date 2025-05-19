@@ -1,0 +1,1 @@
+# watsonx-bash-install
