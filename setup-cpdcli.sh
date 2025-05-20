@@ -29,7 +29,7 @@ if [[ ! -f ${BIN_DIR}/oc ]]; then
 
     ARCH=$(uname -m)
     OC_FILETYPE="linux"
-    OC_URL="https://mirror.openshift.com/pub/openshift-v4/${ARCH}/clients/ocp/${OC_VERSION}/openshift-client-${OC_FILETYPE}.tar.gz"
+    OC_URL="https://mirror.openshift.com/pub/openshift-v4/${ARCH}/clients/ocp/stable-${OC_VERSION}/openshift-client-${OC_FILETYPE}.tar.gz"
 
     curl -sLo $TMP_DIR/openshift-client.tgz $OC_URL
 
