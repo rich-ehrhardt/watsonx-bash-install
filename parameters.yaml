@@ -22,14 +22,12 @@ cpd:
     license_service: ibm-licensing
   ibm_entitlement_key: <ibm_entitlement_key>
 
-# watsonx.ai & rerequisites parameters
+# watsonx.ai & prerequisites parameters
 rhoai:
-  install: yes
   version: "2.16"
   namespace: redhat-ods-operator
 rhnfdt:
-  install: yes
-  namespace: openshfit-nfd
+  namespace: openshift-nfd
 watsonxai:
   install: yes
   tuning_disabled: "false"

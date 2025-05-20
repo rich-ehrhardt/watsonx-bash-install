@@ -24,13 +24,11 @@
     "ibm_entitlement_key": "<ibm_entitlement_key>"
   },
   "rhoai": {
-    "install": "yes",
     "version": "2.16",
     "namespace": "redhat-ods-operator"
   },
   "rhnfdt": {
-    "install": "yes",
-    "namespace": "openshfit-nfd"
+    "namespace": "openshift-nfd"
   },
   "watsonxai": {
     "install": "yes",

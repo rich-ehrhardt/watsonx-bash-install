@@ -46,57 +46,88 @@ if [[ $? != 0 ]]; then
     exit 1
 fi
 
-## Deploy Node Feature Discovery Tool
-echo "*******************************************"
-echo "INFO: Deploying Node Feature Discovery Tool"
-echo "*******************************************"
-/bin/bash ./deploy-nfdt.sh $PARAMETERS
+## Deploy watsonx.ai and prerequisites
+if [[ $(echo $PARAMETERS | jq -r .watsonxai.install ) == "yes" ]]; then
+    ## Deploy Node Feature Discovery Tool
+    echo "*******************************************"
+    echo "INFO: Deploying Node Feature Discovery Tool"
+    echo "*******************************************"
+    /bin/bash ./deploy-nfdt.sh $PARAMETERS
 
-if [[ $? != 0 ]]; then
-    echo "ERROR: Deployment of NFDT was unsuccessful"
-    exit 1
-fi
+    if [[ $? != 0 ]]; then
+        echo "ERROR: Deployment of NFDT was unsuccessful"
+        exit 1
+    fi
 
-## Deploy GPU drivers
-echo "*******************************************"
-echo "INFO: Deploying GPU Drivers"
-echo "*******************************************"
-/bin/bash ./deploy-nvidia-driver.sh $PARAMETERS
+    ## Deploy GPU drivers
+    echo "*******************************************"
+    echo "INFO: Deploying GPU Drivers"
+    echo "*******************************************"
+    /bin/bash ./deploy-nvidia-driver.sh $PARAMETERS
 
-if [[ $? != 0 ]]; then
-    echo "ERROR: Deployment of GPU drivers was unsuccessful"
-    exit 1
-fi
+    if [[ $? != 0 ]]; then
+        echo "ERROR: Deployment of GPU drivers was unsuccessful"
+        exit 1
+    fi
 
-## Deploy Red Hat OpenShift AI
-echo "*******************************************"
-echo "INFO: Deploying Red Hat OpenShift AI"
-echo "*******************************************"
-/bin/bash ./deploy-rhoai.sh $PARAMETERS
+    ## Deploy Red Hat OpenShift AI
+    echo "*******************************************"
+    echo "INFO: Deploying Red Hat OpenShift AI"
+    echo "*******************************************"
+    /bin/bash ./deploy-rhoai.sh $PARAMETERS
 
-if [[ $? != 0 ]]; then
-    echo "ERROR: Deployment of Red Hat OpenShift AI was unsuccessful"
-    exit 1
-fi
+    if [[ $? != 0 ]]; then
+        echo "ERROR: Deployment of Red Hat OpenShift AI was unsuccessful"
+        exit 1
+    fi
 
-## Deploy watsonx.ai
-echo "*******************************************"
-echo "INFO: Deploying watsonx.ai"
-echo "*******************************************"
-/bin/bash ./deploy-watsonx-ai.sh $PARAMETERS
+    ## Deploy watsonx.ai
+    echo "*******************************************"
+    echo "INFO: Deploying watsonx.ai"
+    echo "*******************************************"
+    /bin/bash ./deploy-watsonx-ai.sh $PARAMETERS
 
-if [[ $? != 0 ]]; then
-    echo "ERROR: Deployment of watsonx.ai was unsuccessful"
-    exit 1
+    if [[ $? != 0 ]]; then
+        echo "ERROR: Deployment of watsonx.ai was unsuccessful"
+        exit 1
+    fi
+
+else
+    echo "*******************************************"
+    echo "INFO: SKIPPED watsonx.ai"
+    echo "*******************************************"
 fi
 
 ## Deploy watsonx.governance
-echo "*******************************************"
-echo "INFO: Deploying watsonx.governance"
-echo "*******************************************"
-/bin/bash ./deploy-watsonx-gov.sh $PARAMETERS
+if [[ $(echo $PARAMETERS | jq -r .watsonxgov.install ) == "yes" ]]; then
+    echo "*******************************************"
+    echo "INFO: Deploying watsonx.governance"
+    echo "*******************************************"
+    /bin/bash ./deploy-watsonx-gov.sh $PARAMETERS
 
-if [[ $? != 0 ]]; then
-    echo "ERROR: Deployment of watsonx.governance was unsuccessful"
-    exit 1
+    if [[ $? != 0 ]]; then
+        echo "ERROR: Deployment of watsonx.governance was unsuccessful"
+        exit 1
+    fi
+else
+    echo "*******************************************"
+    echo "INFO: SKIPPED watsonx.governance"
+    echo "*******************************************"
+fi
+
+## Deploy watsonx.data
+if [[ $(echo $PARAMETERS | jq -r .watsonxgov.install ) == "yes" ]]; then
+    echo "*******************************************"
+    echo "INFO: Deploying watsonx.data"
+    echo "*******************************************"
+    /bin/bash ./deploy-watsonx-data.sh $PARAMETERS
+
+    if [[ $? != 0 ]]; then
+        echo "ERROR: Deployment of watsonx.data was unsuccessful"
+        exit 1
+    fi
+else
+    echo "*******************************************"
+    echo "INFO: SKIPPED watsonx.data"
+    echo "*******************************************"   
 fi
