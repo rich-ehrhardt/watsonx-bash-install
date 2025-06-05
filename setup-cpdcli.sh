@@ -103,6 +103,8 @@ if [[ ! -f ${BIN_DIR}/cpd-cli ]]; then
         cp -r * ${BIN_DIR}/
     fi
 
+else
+    echo "INFO: cpd-cli found. Skipping install"
 fi
 
 # Restart cpd-cli container
