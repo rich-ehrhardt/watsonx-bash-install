@@ -47,7 +47,14 @@ if [[ ! -f ${BIN_DIR}/oc ]]; then
     if ! error=$($PREFIX mv ${TMP_DIR}/oc ${BIN_DIR}/oc 2>&1) ; then
         echo "ERROR: Unable to move oc to $BIN_DIR"
         exit 1
+    else
+        echo "INFO: Moved oc to $BIN_DIR"
+
     fi
+
+    # Cleanup
+    echo "INFO: Removing downloaded package"
+    rm ${TMP_DIR}/openshift-client.tgz
 else
     echo "INFO: oc found. Skipping install"
 fi
