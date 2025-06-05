@@ -38,7 +38,13 @@ if [[ ! -f ${BIN_DIR}/oc ]]; then
         exit 1
     fi
 
-    if ! error=$(mv ${TMP_DIR}/oc ${BIN_DIR}/oc 2>&1) ; then
+    if [[ $USER != "root" ]]; then
+        PREFIX="sudo "
+    else
+        PREFIX=""
+    fi
+
+    if ! error=$($PREFIX mv ${TMP_DIR}/oc ${BIN_DIR}/oc 2>&1) ; then
         echo "ERROR: Unable to move oc to $BIN_DIR"
         exit 1
     fi
