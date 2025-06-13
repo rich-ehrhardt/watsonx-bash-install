@@ -222,7 +222,7 @@ done
 TMP_INFERENCE_CONFIG="${TMP_DIR}/inference-config.yaml"
 ${BIN_DIR}/oc get -n redhat-ods-applications configmap/inferenceservice-config -o yaml > $TMP_INFERENCE_CONFIG
 sed -e 's/"domainTemplate": "{{ .Name }}-{{ .Namespace }}.{{ .IngressDomain }}"/"domainTemplate": "example.com"/' -i $TMP_INFERENCE_CONFIG
-${BIN_DIR}/oc create -f $TMP_INFERENCE_CONFIG
+${BIN_DIR}/oc apply -f $TMP_INFERENCE_CONFIG
 ${BIN_DIR}/oc annotate --overwrite -n redhat-ods-applications configmap/inferenceservice-config opendatahub.io/managed=false
 rm $TMP_INFERENCE_CONFIG
 
