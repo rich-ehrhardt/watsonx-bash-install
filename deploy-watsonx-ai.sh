@@ -78,7 +78,7 @@ fi
 
 ###
 # Create the custom spec file
-cat << EOF >> ${CPD_WORKSPACE}/olm-utils-workspace/work/install-options.yaml
+cat << EOF > ${CPD_WORKSPACE}/olm-utils-workspace/work/install-options.yaml
 custom_spec:  
  watsonx_ai:
   tuning_disabled: ${TUNING_DISABLED}
