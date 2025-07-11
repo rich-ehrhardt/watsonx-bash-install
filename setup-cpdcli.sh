@@ -80,7 +80,7 @@ fi
 
 ###
 # Confirm cpd-cli is installed and login to OpenShift with cpd-cli
-if [[ -f ${BIN_DIR}/cpd-cli ]]; then INSTALLED_CPDCLI_VERSION="$(${BIN_DIR}/cpd-cli version | grep Version | awk -F":" '{print $2}' | head -n 1)"; fi
+if [[ -f ${BIN_DIR}/cpd-cli ]]; then INSTALLED_CPDCLI_VERSION="$(${BIN_DIR}/cpd-cli version | grep Version | awk -F":" '{print $2}' | head -n 1 | awk '{$1=$1;print}')"; fi
 if [[ ! -f ${BIN_DIR}/cpd-cli ]] || [[ $INSTALLED_CPDCLI_VERSION != $CPDCLI_VERSION ]]; then
     echo "INFO: cpd-cli not found or wrong version. Installing"
 
