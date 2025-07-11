@@ -20,6 +20,7 @@ BIN_DIR="$(cat $PARAMETERS | jq -r .directories.bin_dir)"
 API_SERVER="$(cat $PARAMETERS | jq -r .cluster.api_server)"
 OCP_USERNAME="$(cat $PARAMETERS | jq -r .cluster.username)"
 OCP_PASSWORD="$(cat $PARAMETERS | jq -r .cluster.password)"
+OCP_TOKEN="$(cat $PARAMETERS | jq -r .cluster.token)"
 export STG_CLASS_FILE="$(cat $PARAMETERS | jq -r .cluster.storageclass.file)"
 export STG_CLASS_BLOCK="$(cat $PARAMETERS | jq -r .cluster.storageclass.block)"
 export VERSION="$(cat $PARAMETERS | jq -r .cpd.version)"
@@ -33,7 +34,11 @@ if [[ ! -f ${BIN_DIR}/oc ]]; then
 else
     if [[ ! $(${BIN_DIR}/oc status 2> /dev/null) ]]; then
         echo "**** Trying to log into the OpenShift cluster from command line"
-        ${BIN_DIR}/oc login "${API_SERVER}" -u $OCP_USERNAME -p $OCP_PASSWORD --insecure-skip-tls-verify=true
+        if [[ $OCP_TOKEN ]]; then
+            ${BIN_DIR}/oc login --server=${API_SERVER} --token=${OCP_TOKEN} --insecure-skip-tls-verify=true
+        else
+            ${BIN_DIR}/oc login "${API_SERVER}" -u $OCP_USERNAME -p $OCP_PASSWORD --insecure-skip-tls-verify=true
+        fi
 
         if [[ $? != 0 ]]; then
             echo "ERROR: Unable to log into OpenShift cluster"
@@ -55,7 +60,12 @@ else
     ${BIN_DIR}/cpd-cli manage restart-container
 
     # Log into openshift from container
-    ${BIN_DIR}/cpd-cli manage login-to-ocp --server "${API_SERVER}" -u $OCP_USERNAME -p $OCP_PASSWORD
+    echo "INFO: Attempting to login to OpenShift from cpdcli container"
+    if [[ $OCP_TOKEN ]]; then
+        ${BIN_DIR}/cpd-cli manage login-to-ocp --server "${API_SERVER}" --token $OCP_TOKEN
+    else
+        ${BIN_DIR}/cpd-cli manage login-to-ocp --server "${API_SERVER}" -u $OCP_USERNAME -p $OCP_PASSWORD
+    fi
 
     if [[ $? != 0 ]]; then
         echo "ERROR: Failed to log into the OpenShift cluster via the cpd cli tool"
@@ -90,7 +100,7 @@ ${BIN_DIR}/cpd-cli manage setup-instance-topology --release=${VERSION} --cpd_ope
 ###
 # Create catalog sources and create subscription for cpd operator
 echo
-echo "**** Creating catalog soruces and subscription for cpd operator"
+echo "**** Creating catalog sources and subscription for cpd operator"
 ${BIN_DIR}/cpd-cli manage apply-olm --release=${VERSION} --components=cpd_platform --cpd_operator_ns=${OPERATOR_NAMESPACE}
 
 if [[ $? != 0 ]]; then
