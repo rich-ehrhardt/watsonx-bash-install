@@ -1,0 +1,60 @@
+# OpenShift cluster details
+cluster:
+  api_server: <cluster_api_url>
+  username: kubeadmin
+  password: <kubeadmin_password>
+  token: ""
+  storageclass:
+    block: ocs-storagecluster-ceph-rbd
+    file: ocs-storagecluster-cephfs
+  version: "4.16"
+
+# Cloud Pak Foundation parameters (common to all services)
+cpd:
+  version: 5.1.3
+  edition: EE
+  cpdcli_version: 14.1.3     # Refer to the URL to match to version
+  namespace:
+    cpd_operator: cpd-operator
+    cpd_operands: cpd-instance
+    cert_manager: ibm-cert-manager
+    scheduling_service: ibm-cpd-scheduler
+    license_service: ibm-licensing
+  ibm_entitlement_key: <ibm_entitlement_key>
+
+# watsonx.ai & prerequisites parameters
+rhoai:
+  version: "2.16"
+  namespace: redhat-ods-operator
+rhnfdt:
+  namespace: openshift-nfd
+watsonxai:
+  install: yes
+  tuning_disabled: "false"
+  lite_version: "false"
+
+# watsonx.goverance parameters
+watsonxgov:
+  install: yes
+  install_type: all
+  factsheet: "true"
+  openscale: "true"
+  openpages:
+    enable: "true"
+    global_search: "false"
+    existing:       
+      existing_instance: "false"           # Specify whether to use an existing OpenPages instance
+      namespace: openpagesinstance-cr      # Only relevant for an existing OpenPages instance
+      db_type: internal                    # Only relevant for an existing OpenPages instance
+      db: Db2                              # Only relevant for an existing OpenPages instance 
+      db_secret: "db2_secret"     # OpenShift secret name with the db credentials (only for existing OpenPages instance)
+
+# watsonx.data parameters
+watsonxdata:
+  install: yes
+
+# workstation parameters
+directories:
+  bin_dir: /usr/local/bin
+  cpd_dir: $HOME/cpd/cpd-cli-workspace
+  tmp_dir: /tmp
