@@ -109,6 +109,16 @@ if [[ $? != 0 ]]; then
 fi
 
 ###
+# Add ibm-entitlement-key secret to cater for IBM Cloud implementations (ignored for others)
+echo "Adding IBM Entitlement secret to operator namespace"
+${BIN_DIR}/oc create secret docker-registry ibm-entitlement-key --docker-server=cp.icr.io --docker-username=cp --docker-password=${IBM_ENTITLEMENT_KEY} -n ${OPERATOR_NAMESPACE}
+
+if [[ $? != 0 ]]; then
+    echo "ERROR: Failed to create the operator namespace IBM Entitlement secret"
+    exit 1
+fi
+
+###
 # Create the cpd platform instance
 echo
 echo "**** Creating the CPD platform operand"
