@@ -80,8 +80,9 @@ fi
 
 ###
 # Confirm cpd-cli is installed and login to OpenShift with cpd-cli
-if [[ ! -f ${BIN_DIR}/cpd-cli ]]; then
-    echo "INFO: cpd-cli not found. Installing"
+if [[ -f ${BIN_DIR}/cpd-cli ]]; then INSTALLED_CPDCLI_VERSION="$(${BIN_DIR}/cpd-cli version | grep Version | awk -F":" '{print $2}' | head -n 1)"; fi
+if [[ ! -f ${BIN_DIR}/cpd-cli ]] || [[ $INSTALLED_CPDCLI_VERSION != $CPDCLI_VERSION ]]; then
+    echo "INFO: cpd-cli not found or wrong version. Installing"
 
     # Download the cpdcli package
     echo "INFO: Downloading cpd-cli package https://github.com/IBM/cpd-cli/releases/download/v${CPDCLI_VERSION}/cpd-cli-linux-${CPD_EDITION}-${CPDCLI_VERSION}.tgz"
@@ -116,7 +117,11 @@ fi
 ${BIN_DIR}/cpd-cli manage restart-container
 
 # Log into openshift from container
-${BIN_DIR}/cpd-cli manage login-to-ocp --server "${API_SERVER}" -u $OCP_USERNAME -p $OCP_PASSWORD
+if [[ $OCP_TOKEN ]]; then
+    ${BIN_DIR}/cpd-cli manage login-to-ocp --server "${API_SERVER}" --token $OCP_TOKEN
+else
+    ${BIN_DIR}/cpd-cli manage login-to-ocp --server "${API_SERVER}" -u $OCP_USERNAME -p $OCP_PASSWORD
+fi
 
 if [[ $? != 0 ]]; then
     echo "ERROR: Failed to log into the OpenShift cluster via the cpd cli tool"
