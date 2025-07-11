@@ -22,6 +22,7 @@ VERSION="$(cat $PARAMETERS | jq -r .cpd.version)"
 CPD_EDITION="$(cat $PARAMETERS | jq -r .cpd.edition)"
 IBM_ENTITLEMENT_KEY="$(cat $PARAMETERS | jq -r .cpd.ibm_entitlement_key)"
 CPDCLI_VERSION="$(cat $PARAMETERS | jq -r .cpd.cpdcli_version)"
+OPERATOR_NAMESPACE="$(cat $PARAMETERS | jq -r .cpd.namespace.cpd_operator)"
 
 ###
 # Confirm oc cli and log into the OpenShift cluster
@@ -142,4 +143,14 @@ if [[ $? != 0 ]]; then
     exit 1
 fi
 
+###
+# Add ibm-entitlement-key secret to cater for IBM Cloud implementations (ignored for others)
+#
+echo "Adding IBM Entitlement secret to operator namespace"
+${BIN_DFIR}/oc create secret docker-registry ibm-entitlement-key --docker-server=cp.icr.io --docker-username=cp --docker-password=${IBM_ENTITLEMENT_KEY} -n ${OPERATOR_NAMESPACE}
+
+if [[ $? != 0 ]]; then
+    echo "ERROR: Failed to create the operator namespace IBM Entitlement secret"
+    exit 1
+fi
 
