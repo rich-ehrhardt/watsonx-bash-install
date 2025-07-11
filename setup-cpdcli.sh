@@ -16,6 +16,7 @@ TMP_DIR="$(cat $PARAMETERS | jq -r .directories.tmp_dir)"
 API_SERVER="$(cat $PARAMETERS | jq -r .cluster.api_server)"
 OCP_USERNAME="$(cat $PARAMETERS | jq -r .cluster.username)"
 OCP_PASSWORD="$(cat $PARAMETERS | jq -r .cluster.password)"
+OCP_TOKEN="$(cat $PARAMETERS | jq -r .cluster.token)"
 OC_VERSION="$(cat $PARAMETERS | jq -r .cluster.version)"
 VERSION="$(cat $PARAMETERS | jq -r .cpd.version)"
 CPD_EDITION="$(cat $PARAMETERS | jq -r .cpd.edition)"
@@ -61,7 +62,11 @@ fi
 
 if [[ ! $(${BIN_DIR}/oc status 2> /dev/null) ]]; then
     echo "**** Trying to log into the OpenShift cluster from command line"
-    ${BIN_DIR}/oc login "${API_SERVER}" -u $OCP_USERNAME -p $OCP_PASSWORD --insecure-skip-tls-verify=true
+    if [[ -z $OCP_TOKEN ]]; then
+        ${BIN_DIR}/oc login --server=${API_SERVER} --token=${OCP_TOKEN} --insecure-skip-tls-verify=true
+    else
+        ${BIN_DIR}/oc login "${API_SERVER}" -u $OCP_USERNAME -p $OCP_PASSWORD --insecure-skip-tls-verify=true
+    fi
 
     if [[ $? != 0 ]]; then
         echo "ERROR: Unable to log into OpenShift cluster"
