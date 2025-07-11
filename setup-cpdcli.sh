@@ -114,9 +114,11 @@ else
 fi
 
 # Restart cpd-cli container
+echo "INFO: Restarting cpdcli container"
 ${BIN_DIR}/cpd-cli manage restart-container
 
 # Log into openshift from container
+echo "INFO: Attempting to login to OpenShift from cpdcli container"
 if [[ $OCP_TOKEN ]]; then
     ${BIN_DIR}/cpd-cli manage login-to-ocp --server "${API_SERVER}" --token $OCP_TOKEN
 else
