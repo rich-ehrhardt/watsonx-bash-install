@@ -62,7 +62,7 @@ fi
 
 if [[ ! $(${BIN_DIR}/oc status 2> /dev/null) ]]; then
     echo "**** Trying to log into the OpenShift cluster from command line"
-    if [[ -z $OCP_TOKEN ]]; then
+    if [[ $OCP_TOKEN ]]; then
         ${BIN_DIR}/oc login --server=${API_SERVER} --token=${OCP_TOKEN} --insecure-skip-tls-verify=true
     else
         ${BIN_DIR}/oc login "${API_SERVER}" -u $OCP_USERNAME -p $OCP_PASSWORD --insecure-skip-tls-verify=true
