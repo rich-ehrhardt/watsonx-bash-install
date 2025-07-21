@@ -16,6 +16,7 @@ export CPD_WORKSPACE="$(cat $PARAMETERS | jq -r .directories.cpd_dir)"
 export API_SERVER="$(cat $PARAMETERS | jq -r .cluster.api_server)"
 export OCP_USERNAME="$(cat $PARAMETERS | jq -r .cluster.username)"
 export OCP_PASSWORD="$(cat $PARAMETERS | jq -r .cluster.password)"
+export OCP_TOKEN="$(cat $PARAMETERS | jq -r .cluster.token)"
 export STG_CLASS_FILE="$(cat $PARAMETERS | jq -r .cluster.storageclass.file)"
 export STG_CLASS_BLOCK="$(cat $PARAMETERS | jq -r .cluster.storageclass.block)"
 export OPERATOR_NAMESPACE="$(cat $PARAMETERS | jq -r .cpd.namespace.cpd_operator)"
@@ -32,7 +33,11 @@ if [[ ! -f ${BIN_DIR}/oc ]]; then
 else
     if [[ ! $(${BIN_DIR}/oc status 2> /dev/null) ]]; then
         echo "**** Trying to log into the OpenShift cluster from command line"
-        ${BIN_DIR}/oc login "${API_SERVER}" -u $OCP_USERNAME -p $OCP_PASSWORD --insecure-skip-tls-verify=true
+        if [[ $OCP_TOKEN ]]; then
+            ${BIN_DIR}/oc login --server=${API_SERVER} --token=${OCP_TOKEN} --insecure-skip-tls-verify=true
+        else
+            ${BIN_DIR}/oc login "${API_SERVER}" -u $OCP_USERNAME -p $OCP_PASSWORD --insecure-skip-tls-verify=true
+        fi
 
         if [[ $? != 0 ]]; then
             echo "ERROR: Unable to log into OpenShift cluster"
@@ -57,8 +62,12 @@ if [[ ! -f ${BIN_DIR}/cpd-cli ]]; then
     echo "ERROR: cpd-cli not installed at ${BIN_DIR}/cpd-cli"
     exit 0
 else
-    ${BIN_DIR}/cpd-cli manage login-to-ocp --server "${API_SERVER}" -u $OCP_USERNAME -p $OCP_PASSWORD
-
+    echo "**** Attempting to login to OpenShift from cpdcli container"
+    if [[ $OCP_TOKEN ]]; then
+        ${BIN_DIR}/cpd-cli manage login-to-ocp --server "${API_SERVER}" --token $OCP_TOKEN
+    else
+        ${BIN_DIR}/cpd-cli manage login-to-ocp --server "${API_SERVER}" -u $OCP_USERNAME -p $OCP_PASSWORD
+    fi
     if [[ $? != 0 ]]; then
         echo "ERROR: Failed to log into the OpenShift cluster via the cpd cli tool"
         exit 1
@@ -87,6 +96,8 @@ EOF
 
 ###
 # Create the watsonx.ai operand
+echo
+echo "**** Creating watsonx.ai operands in ${INSTANCE_NAMESPACE}"
 ${BIN_DIR}/cpd-cli manage apply-cr --release=${VERSION} --components=watsonx_ai  --license_acceptance=true --cpd_operator_ns=${OPERATOR_NAMESPACE} --cpd_instance_ns=${INSTANCE_NAMESPACE} --file_storage_class=${STG_CLASS_FILE} --block_storage_class=${STG_CLASS_BLOCK} --param-file=/tmp/work/install-options.yaml
 
 if [[ $? != 0 ]]; then
